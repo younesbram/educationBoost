@@ -146,12 +146,7 @@ if st.button("Generate Content"):
             content = generate_content(
                 topic, content_type, assignment_type, difficulty, question_type, question_count)
             st.write(content)
-            # Generate the PDF content and download the PDF file
-            if st.button("Generate PDF"):
-                st.markdown("Downloading the PDF...")
-                pdf_content = generate_pdf_content(content)
-                st.download_button(label="Download PDF", data=pdf_content,
-                                   file_name="output.pdf", mime="application/pdf")
+            st.download_button('Download', content)
             st.markdown(
                 "[Donate here](https://donate.stripe.com/dR68x365dgNPaXeaEE)")
             st.markdown(
