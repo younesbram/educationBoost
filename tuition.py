@@ -3,15 +3,22 @@ import streamlit as st
 import openai
 
 # free app, created using vim foot pedals
-
+st.set_page_config(page_title="EducationBoost", page_icon="🤩", layout="centered", initial_sidebar_state="auto", menu_items={
+    "Get Help": "https://www.github.com/younesbram/aicomedy",
+    "Report a bug": "https://www.younes.ca/contact",
+    "About": "# Generative Education!",
+},)
 
 # generate a pdf file from a string
+
+
 def generate_pdf_content(content):
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", size=12)
     pdf.multi_cell(0, 5, content)
     return pdf.output(dest="S").encode("latin1")
+
 
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 
@@ -73,7 +80,7 @@ def generate_assignment(topic, difficulty, assignment_type):
             temperature=0.8,
         )
         generatedAdvice = response['choices'][0]['message']['content']
-    
+
     return generatedAdvice
 
 
