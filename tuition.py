@@ -27,7 +27,7 @@ def generate_course_outline(topic, difficulty):
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[
-            {"role": "system", "content": "You are a helpful, well organized assistant that creates course outlines.  Adapt to the difficulty of the course : either Beginner, Advanced, or Expert but never mention it and never mention anything else other than the course outline."},
+            {"role": "system", "content": "You are a helpful, well organized professor that creates course outlines.  Adapt to the difficulty of the course but never mention it and never mention anything else other than the course outline."},
             {"role": "system", "name": "example_user",
                 "content": "I need to create a course outline for my advanced differential equations class."},
             {"role": "system", "name": "example_assistant",
@@ -53,7 +53,7 @@ def generate_assignment(topic, difficulty, assignment_type):
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "You are a helpful assistant that creates quizzes. Adapt to the difficulty of the course : either Beginner, Advanced, or Expert but never mention it."},
+                {"role": "system", "content": "You are a helpful professor that creates quizzes. Adapt to the difficulty of the course but never mention it."},
                 {"role": "user", "content": f"Pretend you are my professor. Give me a quiz for my {difficulty}-level  {topic} class. My professor is very well trained in his field and in the field of making learning fun and engaging. Make it a professional one that would really help any student"},
             ],
             temperature=0.8,
@@ -64,7 +64,7 @@ def generate_assignment(topic, difficulty, assignment_type):
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "You are a helpful assistant that creates homework. Adapt to the difficulty of the course : either Beginner, Advanced, or Expert but never mention it."},
+                {"role": "system", "content": "You are a helpful professor that creates homework. Adapt to the difficulty of the course but never mention it."},
                 {"role": "user", "content": f"Pretend you are my professor. Give me a homework for my {difficulty}-level  {topic} class. My professor is very well trained in his field and in the field of making learning fun and engaging. Make it a professional one that would really help any student"},
             ],
             temperature=0.8,
@@ -74,7 +74,7 @@ def generate_assignment(topic, difficulty, assignment_type):
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "You are a helpful assistant that creates assignments. Adapt to the difficulty of the course : either Beginner, Advanced, or Expert but never mention it."},
+                {"role": "system", "content": "You are a helpful professor that creates assignments. Adapt to the difficulty of the course but never mention it."},
                 {"role": "user", "content": f"Pretend you are my professor. Give me an assignment for my {difficulty}-level  {topic} class. My professor is very well trained in his field and in the field of making learning fun and engaging. Make it a professional one that would really help any student"},
             ],
             temperature=0.8,
@@ -88,7 +88,7 @@ def generate_lecture(topic, difficulty):
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[
-            {"role": "system", "content": "You are a helpful assistant that creates lectures. Adapt to the difficulty of the course : either Beginner, Advanced, or Expert but never mention it. You ONLY respond with the lecture starting with Prof AI:"},
+            {"role": "system", "content": "You are a helpful professor that creates lectures. Adapt to the difficulty of the course but never mention it. You ONLY respond with the lecture starting with Prof AI:"},
             {"role": "user", "content": f"Pretend you are my professor. Give me a lecture for my {difficulty}-level  {topic} class. My professor is very well trained in his field and in the field of making learning fun and engaging. Make it a long and detailed one that would really help any student"},
         ],
         temperature=0.8,
@@ -101,7 +101,7 @@ def generate_questions(topic, question_type, question_count, difficulty):
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[
-            {"role": "system", "content": "You are a helpful question maker that creates different types of questions. Always remind people of hints to go with their topic. Adapt to the difficulty of the course : either Beginner, Advanced, or Expert but never mention it."},
+            {"role": "system", "content": "You are a helpful question maker that creates different types of questions. Always remind people of hints to go with their topic. Adapt to the difficulty of the course but never mention it."},
             {"role": "user", "content": f"Pretend you are my professor. Give me {question_count}  {question_type}-type question for my {difficulty}-level  {topic} class. My professor is very well trained in his field and in the field of making learning fun and engaging. He  ORGANIZES them with newlines and bigger text"},
         ],
         temperature=0.8,
@@ -124,23 +124,47 @@ def generate_content(topic, content_type, assignment_type, difficulty, question_
 st.title("LearnBoost: AI-Powered Education")
 
 difficulty = st.selectbox("Select Difficulty Level",
-                          ("Beginner", "Advanced", "Expert"))
+                          ("Beginner", "High School" "University 1st year", "University 2nd year", "University 3rd year", "University 4th year", "Postgraduate", "PhD", "Hardest Possible (Insane difficulty)"))
 
 topic = st.text_input("Topic", max_chars=130)
 content_type = st.selectbox(
     "Content Type", ("Course Outline", "Assignment", "Questions", "Lecture"))
 question_type = ["True or False", "Short Answer", "Matching", "Fill in the blank",
-                 "Multiple choice", "Coding", "Essay", "Problem-solving", "Case study", "Random real life situation"]
+                 "Multiple Choice", "Coding", "Essay", "Problem-solving", "Case study", "Random real life situation"]
 assignment_type = ["Quiz", "Homework", "Assignment"]
 question_count = 1
 
 if content_type == "Questions":
     question_type = st.selectbox("Question Type", question_type)
-    question_count = st.slider("Number of Questions", 1, 3)
-    if question_count > 1 and question_type == "Essay" or question_type == "Case study":
-        st.warning(
-            "Essay questions & Case studies can only be generated one at a time.")
-        question_count = 1
+
+    if question_type == "True or False":
+        question_count = st.slider(
+            "Number of Questions", 1, 20, key="tf_count")
+    if question_type == "Multiple Choice":
+        question_count = st.slider(
+            "Number of Questions", 1, 25, key="mc_count")
+    elif question_type in ["Short Answer", "Fill in the blank"]:
+        question_count = st.slider(
+            "Number of Questions", 1, 10, key="sa_fb_count")
+    elif question_type == "Matching":
+        question_count = st.slider(
+            "Number of Questions", 1, 5, key="matching_count")
+    elif question_type == "Coding":
+        question_count = st.slider(
+            "Number of Questions", 1, 3, key="coding_count")
+    elif question_type == "Essay":
+        question_count = st.slider(
+            "Number of Questions", 1, 2, key="essay_count")
+    elif question_type == "Problem-solving":
+        question_count = st.slider(
+            "Number of Questions", 1, 5, key="problem_solving_count")
+    elif question_type == "Case study":
+        question_count = st.slider(
+            "Number of Questions", 1, 2, key="case_study_count")
+    elif question_type == "Random real life situation":
+        question_count = st.slider(
+            "Number of Questions", 1, 5, key="real_life_count")
+
 
 if content_type == "Assignment":
     assignment_type = st.selectbox("Assignment Type", assignment_type)
@@ -158,3 +182,4 @@ if st.button("Generate Content"):
                 "[Donate here](https://donate.stripe.com/dR68x365dgNPaXeaEE)")
             st.markdown(
                 "[Request access to GPT4 mode](https://twitter.com/didntdrinkwater)")
+            st.balloons()  # Add balloons effect
